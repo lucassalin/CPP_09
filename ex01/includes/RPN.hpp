@@ -6,7 +6,7 @@
 /*   By: lsalin <lsalin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 21:57:53 by lsalin            #+#    #+#             */
-/*   Updated: 2023/04/28 22:01:22 by lsalin           ###   ########.fr       */
+/*   Updated: 2023/04/28 22:15:20 by lsalin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,39 +39,39 @@
 class RPN
 {
 	private:
-		std::stack<int> _calculator;
+		std::stack<int>	_calculator;
 
-		void _calculate( std::string & input );
-		std::string _getNextElement( std::string & input );
-		void _handleElement( std::string & element );
-		void _handleOperand( std::string & element );
-		void _handleOperator( std::string & element );
-		int _getNextOperand( void );
-		int _calculateResult( std::string & operation, int first, int second );
+		void		_calculate(std::string &input);
+		std::string	_getNextElement(std::string &input);
+		void		_handleElement(std::string &element);
+		void		_handleOperand(std::string &element);
+		void		_handleOperator(std::string &element);
+		int			_getNextOperand(void);
+		int			_calculateResult(std::string &operation, int first, int second);
 
-		bool _isOperand( std::string & string ) const;
-		bool _isOperator( std::string & string ) const;
+		bool		_isOperand(std::string &string) const;
+		bool		_isOperator(std::string &string) const;
 
-		void _checkInput( std::string & input );
-		void _checkCalculatorValidity( void );
+		void		_checkInput(std::string &input);
+		void		_checkCalculatorValidity(void);
 
-		std::string _getCalculatorContentsAsString( void );
+		std::string	_getCalculatorContentsAsString(void);
 
-		RPN( void );
+		RPN(void);
 
 	public:
-		RPN( std::string input );
-		RPN( RPN & src );
-		~RPN( void );
+		RPN(std::string input);
+		RPN(RPN &src);
+		~RPN(void);
 
-		RPN & operator=( RPN & src );
+		RPN &operator=(RPN &src);
 
-		int getResult( void );
+		int	getResult(void);
 
 		class EndOfInputException : public std::exception
 		{
 			public:
-				virtual const char * what( void ) const throw();
+				virtual const char *what(void) const throw();
 		};
 };
 
