@@ -6,7 +6,7 @@
 /*   By: lsalin <lsalin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 12:06:00 by lsalin            #+#    #+#             */
-/*   Updated: 2023/04/28 15:08:03 by lsalin           ###   ########.fr       */
+/*   Updated: 2023/04/28 16:25:11 by lsalin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,12 +27,109 @@ BitcoinExchange::BitcoinExchange(void)
 	}
 }
 
-/**
-	@brief 
-	
-	@param date : 
+BitcoinExchange::BitcoinExchange(BitcoinExchange &src)
+{
+	this->_exchangeRate = src._exchangeRate;
+}
 
-	@return time_t 
+BitcoinExchange::~BitcoinExchange(void) {}
+
+BitcoinExchange &BitcoinExchange::operator=(BitcoinExchange &src)
+{
+	this->_exchangeRate = src._exchangeRate;
+	return (*this);
+}
+
+// Ajoute une entrée de taux de change Bitcoin à la map des taux de change
+
+void	BitcoinExchange::_addExchangeRateEntry(time_t date, double value)
+{
+	std::map<time_t, double>::iterator	it = _exchangeRate.find(date);
+
+	if (it != _exchangeRate.end())
+		it->second = value;
+
+	else
+		_exchangeRate.insert( std::pair<time_t, double>(date, value));
+}
+
+// [2012-01-11] 1.00 * 7.10 = 7.10
+
+void	BitcoinExchange::outputExchangeValueOnDate( std::string &dateStr, std::string &valueStr )
+{
+	_checkInputStrings(dateStr, valueStr);
+
+	time_t	date = _getEpochFromDateString(dateStr);
+	double	value = _getValueFromString(valueStr);
+	double	exchangeRate = _getExchangeRateOnDate(date);
+	double	exchangeValue = getExchangeValueOnDate(dateStr, valueStr);
+
+	if (VERBOSE)
+		_printClosestExchangeRate(date);
+
+	std::cout << std::fixed;
+	std::cout.precision(2);
+	std::cout << "[" << _getDateFromEpoch(date) << "] " << value << " * ";
+	std::cout << exchangeRate << " = " << exchangeValue << std::endl;
+}
+
+// Affiche le taux de change le plus proche de la date donnée
+
+void	BitcoinExchange::_printClosestExchangeRate(time_t date)
+{
+	time_t		closestEpoch = _getClosestDateInTable(date);
+	std::string	closestDate = _getDateFromEpoch(closestEpoch);
+
+	std::cout << YELLOW << "Closest exchange data: " << closestDate << " -> ";
+
+	std::cout << std::fixed; // précision de 2 décimales
+	std::cout.precision(2);
+	
+	std::cout << _exchangeRate[closestEpoch] << RESET << std::endl;
+}
+
+// Retourne la valeur du bitcoin multipliée par son taux de change à la date donnée
+// Si la date n'existe pas dans la DB, on utilise la plus proche inférieurement
+
+double	BitcoinExchange::getExchangeValueOnDate(std::string &dateStr, std::string &valueStr)
+{
+	_checkInputStrings(dateStr, valueStr);
+
+	double	rate = _getExchangeRateOnDate(_getEpochFromDateString(dateStr));
+	double	value = _getValueFromString(valueStr);
+
+	return (value * rate);
+}
+
+// Retourne le taux de change le plus proche pour la date donnée
+double	BitcoinExchange::_getExchangeRateOnDate(time_t date)
+{
+	time_t	closestDate = _getClosestDateInTable(date);
+
+	return (_exchangeRate[closestDate]);
+}
+
+/**
+	@brief Cherche la date du taux de change le plus proche de la date fournie
+	
+	@param date : date pour laquelle on souhaite obtenir le taux de change le plus proche (sujet)
+				  si elle n'existe pas dans la DB, on prends la plus proche (inférieure et non supérieure !)
+
+	@return time_t : date la plus proche trouvée en temps Epoch
+
+	@example _exchangeRate = 
+								10 avril 2023
+								12 avril 2023
+								13 avril 2023
+								15 avril 2023
+								18 avril 2023
+
+			On veut obtenir le taux de change du 14 avril 2023
+			1) Conversion en temps Epoch (s)
+			2) 14 avril 2023 n'est pas présent dans la table
+			2) 14 avril 2023 n'est pas antérieure au 10 avril 2023
+			3) Soustrait de 1 jour (86400s) la date fournie, à chaque tour de boucle
+			   Jusqu'à trouver la date la plus proche inférieurement (13 avril 2023 ici)
  */
 
 time_t	BitcoinExchange::_getClosestDateInTable(time_t date)
@@ -41,12 +138,17 @@ time_t	BitcoinExchange::_getClosestDateInTable(time_t date)
 	// si oui, it pointe directement dessus
 	std::map<time_t, double>::iterator	it = _exchangeRate.find(date);
 
+	// si la date recherchée est antérieure à la première date de la table des taux de change
+	// --> on la retourne (car c'est la plus proche de la date recherchée)
+
 	if (date < _exchangeRate.begin()->first)
 		return (_exchangeRate.begin()->first);
 
+	// Sinon, on recherche la date la plus proche
+	
 	for (int i = 0; it == _exchangeRate.end(); i++)
 	{
-		time_t	newDate = date - i * 24 * 60 * 60;
+		time_t	newDate = date - i * 24 * 60 * 60; // 24 x 60 x 60 = nombre de s dans 1 journée
 		it = _exchangeRate.find(newDate);
 	}
 

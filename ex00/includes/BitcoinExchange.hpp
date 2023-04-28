@@ -6,7 +6,7 @@
 /*   By: lsalin <lsalin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 12:05:44 by lsalin            #+#    #+#             */
-/*   Updated: 2023/04/28 12:33:50 by lsalin           ###   ########.fr       */
+/*   Updated: 2023/04/28 15:47:14 by lsalin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,18 @@
 #define DATE 0
 #define VALUE 1
 
+#define BLACK	"\e[30m"
+#define RED		"\e[31m"
+#define GREEN	"\e[32m"
+#define YELLOW	"\e[33m"
+#define BLUE	"\e[34m"
+#define PURPLE	"\e[35m"
+#define CYAN	"\e[36m"
+#define WHITE	"\e[37m"
+#define RESET	"\e[0m"
+
 #include <cstdlib>
+#include <cctype>
 #include <ctime>
 #include <exception>
 #include <fstream>
