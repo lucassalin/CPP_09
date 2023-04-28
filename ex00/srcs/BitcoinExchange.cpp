@@ -6,7 +6,7 @@
 /*   By: lsalin <lsalin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 12:06:00 by lsalin            #+#    #+#             */
-/*   Updated: 2023/04/28 16:25:11 by lsalin           ###   ########.fr       */
+/*   Updated: 2023/04/28 21:50:15 by lsalin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,8 +40,46 @@ BitcoinExchange &BitcoinExchange::operator=(BitcoinExchange &src)
 	return (*this);
 }
 
-// Ajoute une entrée de taux de change Bitcoin à la map des taux de change
+// Lit les donnees du .csv et les ajoutent a la map _exchangeRate
+void	BitcoinExchange::_fillExchangeRateTable(void)
+{
+	std::fstream	fs;
+	fs.open("data/data.csv", std::fstream::in);
 
+	if (fs.fail())
+		throw (std::runtime_error("Could not open data file"));
+
+	char	line[100];
+	fs.getline(line, 100);
+	
+	while (!fs.eof())
+	{
+		char	line[100];
+		fs.getline(line, 100);
+
+		if (!fs.eof() && line[0] != '\0')
+			_fillExchangeRateEntry(std::string(line));
+	}
+}
+
+// Traite les donnes du .csv et ajoute les taux de change a la map _exchangeRate
+// 2009-01-02,0
+
+void	BitcoinExchange::_fillExchangeRateEntry(std::string line)
+{
+	std::string	*split = splitString(line, ",");
+
+	_checkDateString(split[DATE]);
+	_checkValueString(split[VALUE]);
+
+	time_t	date = _getEpochFromDateString(split[DATE]);
+	double	value = _getValueFromString(split[VALUE]);
+
+	_addExchangeRateEntry(date, value);
+	delete [] (split);
+}
+
+// Ajoute une date et une valeur a la map _exchangeRate
 void	BitcoinExchange::_addExchangeRateEntry(time_t date, double value)
 {
 	std::map<time_t, double>::iterator	it = _exchangeRate.find(date);
@@ -50,11 +88,10 @@ void	BitcoinExchange::_addExchangeRateEntry(time_t date, double value)
 		it->second = value;
 
 	else
-		_exchangeRate.insert( std::pair<time_t, double>(date, value));
+		_exchangeRate.insert(std::pair<time_t, double>(date, value));
 }
 
 // [2012-01-11] 1.00 * 7.10 = 7.10
-
 void	BitcoinExchange::outputExchangeValueOnDate( std::string &dateStr, std::string &valueStr )
 {
 	_checkInputStrings(dateStr, valueStr);
@@ -74,7 +111,6 @@ void	BitcoinExchange::outputExchangeValueOnDate( std::string &dateStr, std::stri
 }
 
 // Affiche le taux de change le plus proche de la date donnée
-
 void	BitcoinExchange::_printClosestExchangeRate(time_t date)
 {
 	time_t		closestEpoch = _getClosestDateInTable(date);

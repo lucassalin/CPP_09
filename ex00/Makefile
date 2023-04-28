@@ -1,9 +1,5 @@
-.PHONY: all re clean fclean
+NAME		= btc
 
-# Program name
-NAME	= btc
-
-# Compiler
 CC			= c++
 CFLAGS		= -Werror -Wextra -Wall -g -std=c++98
 
@@ -33,3 +29,5 @@ fclean: clean
 	rm -f $(NAME)
 
 re: fclean all
+
+.PHONY: all re clean fclean
