@@ -6,7 +6,7 @@
 /*   By: lsalin <lsalin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/29 12:37:34 by lsalin            #+#    #+#             */
-/*   Updated: 2023/05/01 13:14:06 by lsalin           ###   ########.fr       */
+/*   Updated: 2023/05/01 14:15:08 by lsalin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,15 +79,16 @@ void	PmergeMe::ft_sort(char **tab)
 {
 	std::clock_t	start;
 	std::clock_t	end;
-	double			Vtime;
-	double			Dtime;
+	double			Vtime;	// temps ecoule de l'execution du vecteur
+	double			Dtime;	// temps ecoule de l'execution du deque
 	int				i = 1;
 	int				nb = 0;
 
+	// parcourt les arguments du programme
 	while (tab[i])
 	{
 		is_Num(tab[i]);
-		std::istringstream(tab[i]) >> nb;
+		std::istringstream(tab[i]) >> nb; // convertit la string en int
 
 		_vector.push_back(nb);
 		_deque.push_back(nb);
@@ -97,18 +98,22 @@ void	PmergeMe::ft_sort(char **tab)
 
 	std::cout << "Before :";
 	printVector();
+
 	start = clock();
 	merge_sort(_vector, 0, _vector.size() - 1);
 	end = clock();
 	Vtime = static_cast<double>(end - start) / CLOCKS_PER_SEC * 1000;
+
 	start = clock();
 	merge_sort(_deque, 0, _vector.size() - 1);
 	end = clock();
 	Dtime = static_cast<double>(end - start) / CLOCKS_PER_SEC * 1000;
+
 	std::cout << "After :";
 	printVector();
 	//printDeque();
+
 	std::cout << std::fixed << std::setprecision(3);
 	std::cout << "Time to process a range of "<< _vector.size() <<  " elements with std::vector : " << Vtime << " ms\n";
-	std::cout << "Time to process a range of "<< _deque.size() <<  " elements with std::list : " << Dtime << " ms\n";
+	std::cout << "Time to process a range of "<< _deque.size() <<  " elements with std::deque : " << Dtime << " ms\n";
 }

@@ -6,7 +6,7 @@
 /*   By: lsalin <lsalin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/29 12:37:36 by lsalin            #+#    #+#             */
-/*   Updated: 2023/05/01 13:02:43 by lsalin           ###   ########.fr       */
+/*   Updated: 2023/05/01 14:07:03 by lsalin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,8 +62,8 @@ class PmergeMe
 		void	merge(T &lst, int left, int mid, int right)
 		{
 			std::vector<int>	temp(right - left + 1); // stocke temporairement les elements fusionnes
-			int					i = left				// premier element du premier sous-tableau
-			int					j = mid + 1 			// premier element du deuxieme sous-tableau
+			int					i = left;				// premier element du premier sous-tableau
+			int					j = mid + 1; 			// premier element du deuxieme sous-tableau
 			int					k = 0;					// index pour inserer des elements dans temp
 
 			/**
