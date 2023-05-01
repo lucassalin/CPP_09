@@ -6,7 +6,7 @@
 /*   By: lsalin <lsalin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 12:05:44 by lsalin            #+#    #+#             */
-/*   Updated: 2023/05/01 14:28:13 by lsalin           ###   ########.fr       */
+/*   Updated: 2023/05/01 15:28:32 by lsalin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,6 @@
 #define BITCOIN_EXCHANGE_HPP
 
 #define VERBOSE 1
-
 #define DATE 0
 #define VALUE 1
 
