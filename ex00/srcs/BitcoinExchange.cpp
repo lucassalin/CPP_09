@@ -6,7 +6,7 @@
 /*   By: lsalin <lsalin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 12:06:00 by lsalin            #+#    #+#             */
-/*   Updated: 2023/04/28 21:50:15 by lsalin           ###   ########.fr       */
+/*   Updated: 2023/05/01 15:27:19 by lsalin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -181,7 +181,7 @@ time_t	BitcoinExchange::_getClosestDateInTable(time_t date)
 		return (_exchangeRate.begin()->first);
 
 	// Sinon, on recherche la date la plus proche
-	
+
 	for (int i = 0; it == _exchangeRate.end(); i++)
 	{
 		time_t	newDate = date - i * 24 * 60 * 60; // 24 x 60 x 60 = nombre de s dans 1 journée
@@ -191,14 +191,7 @@ time_t	BitcoinExchange::_getClosestDateInTable(time_t date)
 	return (it->first);
 }
 
-/**
-	@brief Convertit dateStr en temps Epoch
-	
-	@param dateStr : date au format "YYYY-MM-DD"
-	
-	@return time_t : nombre de secondes écoulées depuis le 01/01/1970
- */
-
+// Convertit une date ("YYYY-MM-DD") en time_t
 time_t	BitcoinExchange::_getEpochFromDateString(std::string &dateStr) const
 {
 	struct tm	tm;
@@ -234,6 +227,7 @@ int	BitcoinExchange::_getYearFromString(std::string &dateStr) const
 
 	if (yearStr.empty() || year < 0 || year > 2050)
 		throw std::out_of_range(dateStr + ": invalid date");
+
 	return (year);
 }
 
@@ -254,8 +248,8 @@ int	BitcoinExchange::_getMonthFromString(std::string &dateStr) const
 	return (month);
 }
 
-// Extrait le jour d'une date au format (AAAA-MM-JJ)
-// Et la retourne sous forme d'int
+// Extrait le jour d'une date au format "YYYY-MM-DD"
+// Et le retourne sous forme d'int
 
 int	BitcoinExchange::_getDayFromString(std::string &dateStr) const
 {
@@ -274,23 +268,22 @@ int	BitcoinExchange::_getDayFromString(std::string &dateStr) const
 	}
 
 	int	day = std::atoi(dayStr.c_str());
-	
+
 	if (dayStr.empty() || day < 1 || day > 31)
 		throw std::out_of_range( dateStr + ": invalid date");
 
 	return (day);
 }
 
-// Convertit une date (temps Unix) en une string au format "YYYY-MM-DD"
-// Epoch = mesure de temps en secondes écoulées depuis 01/01/1970
+// Convertit un time_t (temps en s depuis 1970) en une string au format "YYYY-MM-DD"
 
 std::string const	BitcoinExchange::_getDateFromEpoch(time_t epochDate) const
 {
+	// localtime() convertit le temps en s depuis 1970 en une structure tm
 	struct tm			*date = localtime(&epochDate);
 	std::stringstream	ss;
 
-	// string représentant l'année est ajoutée au flux (+1900 car tm stocke les années depuis 1900)
-	ss << std::setfill('0') << std::setw(4) << date->tm_year + 1900;
+	ss << std::setfill('0') << std::setw(4) << date->tm_year + 1900; // (+1900 car tm stocke les années depuis 1900)
 	ss << "-" << std::setfill('0') << std::setw(2) << date->tm_mon + 1; // + 1 car tm compte les mois de 0 à 11
 	ss << "-" << std::setfill('0') << std::setw(2) << date->tm_mday;
 
@@ -343,7 +336,7 @@ void	BitcoinExchange::_checkValueString(std::string &string) const
 	}
 }
 
-// Check si la string représente une date valide "Year-Month-Day"
+// Check si la string représente une date valide "Year-Month-Day" (donc chiffres et "-")
 // Lève une exception si c'est pas le cas
 
 void	BitcoinExchange::_checkDateString(std::string &string) const
@@ -354,12 +347,12 @@ void	BitcoinExchange::_checkDateString(std::string &string) const
 	std::string	required = "0123456789-";
 	// cherche la première occurence d'un caractère appartenant à required dans string
 	size_t		pos = string.find_first_of(required, 0);
-	
+
 	if (pos == std::string::npos)
 		throw (std::runtime_error(string + ": invalid date"));
-		
+
 	std::string::iterator	it = string.begin();
-	
+
 	for ( ; it != string.end(); it++)
 	{
 		if (std::isalpha(*it) || !std::isprint(*it))
@@ -367,7 +360,7 @@ void	BitcoinExchange::_checkDateString(std::string &string) const
 	}
 }
 
-// Check si la string ,représentant le jour d'une date, est valide
+// Check si la string (représentant le jour d'une date) est valide
 // Valide = ne contient que des chiffres ou des espaces
 // Lève une exception si c'est pas le cas
 
