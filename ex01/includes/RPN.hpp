@@ -6,24 +6,12 @@
 /*   By: lsalin <lsalin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 21:57:53 by lsalin            #+#    #+#             */
-/*   Updated: 2023/04/28 22:15:20 by lsalin           ###   ########.fr       */
+/*   Updated: 2023/05/02 11:50:27 by lsalin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef REVERSE_POLISH_NOTATION_HPP
 #define REVERSE_POLISH_NOTATION_HPP
-
-#define VERBOSE 1
-
-#define BLACK	"\e[30m"
-#define RED		"\e[31m"
-#define GREEN	"\e[32m"
-#define YELLOW	"\e[33m"
-#define BLUE	"\e[34m"
-#define PURPLE	"\e[35m"
-#define CYAN	"\e[36m"
-#define WHITE	"\e[37m"
-#define RESET	"\e[0m"
 
 #include <cctype>
 #include <cstddef>

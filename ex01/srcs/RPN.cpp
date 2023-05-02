@@ -6,7 +6,7 @@
 /*   By: lsalin <lsalin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 21:57:50 by lsalin            #+#    #+#             */
-/*   Updated: 2023/04/29 11:49:32 by lsalin           ###   ########.fr       */
+/*   Updated: 2023/05/02 12:35:47 by lsalin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,7 @@ void	RPN::_handleOperator(std::string &element)
 	int	second = _getNextOperand();
 	int	first = _getNextOperand();
 	int	res = _calculateResult(element, first, second);
-	
+
 	_calculator.push(res);
 }
 
@@ -139,13 +139,13 @@ bool	RPN::_isOperator(std::string &string) const
 	return (false);
 }
 
-// Extrait et retourne le prochain élément (chiffre/opérateur) de l'entrée en NPI
-// en ignorant les espaces
-
+// Extrait et retourne le prochain élément (chiffre/opérateur) de l'input
 std::string	RPN::_getNextElement(std::string &input)
 {
+	// static pour conserver sa position dans la string entrée
+	// entre les appels successifs de _getNextElement()
 	static	std::string::iterator it = input.begin();
-	
+
 	for ( ; it != input.end(); it++)
 	{
 		if (*it == ' ')
@@ -170,9 +170,9 @@ void	RPN::_checkInput(std::string &input)
 
 	if (pos != std::string::npos)
 		throw (std::out_of_range ("invalid input: can only contain " + allowed));
-		
-	pos = input.find_first_of( requiredDigits, 0 );
-	
+
+	pos = input.find_first_of(requiredDigits, 0);
+
 	if (pos == std::string::npos)
 		throw (std::out_of_range ("invalid input: requires at least one of " + requiredDigits));
 
