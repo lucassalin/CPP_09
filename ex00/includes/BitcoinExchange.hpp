@@ -6,26 +6,16 @@
 /*   By: lsalin <lsalin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 12:05:44 by lsalin            #+#    #+#             */
-/*   Updated: 2023/05/01 15:28:32 by lsalin           ###   ########.fr       */
+/*   Updated: 2023/05/02 11:27:31 by lsalin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef BITCOIN_EXCHANGE_HPP
 #define BITCOIN_EXCHANGE_HPP
 
-#define VERBOSE 1
+#define BONUS 1
 #define DATE 0
 #define VALUE 1
-
-#define BLACK	"\e[30m"
-#define RED		"\e[31m"
-#define GREEN	"\e[32m"
-#define YELLOW	"\e[33m"
-#define BLUE	"\e[34m"
-#define PURPLE	"\e[35m"
-#define CYAN	"\e[36m"
-#define WHITE	"\e[37m"
-#define RESET	"\e[0m"
 
 #include <cstdlib>
 #include <cctype>

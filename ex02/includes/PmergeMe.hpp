@@ -6,7 +6,7 @@
 /*   By: lsalin <lsalin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/29 12:37:36 by lsalin            #+#    #+#             */
-/*   Updated: 2023/05/01 14:07:03 by lsalin           ###   ########.fr       */
+/*   Updated: 2023/05/02 14:14:34 by lsalin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,8 +36,9 @@ class PmergeMe
 		void	printVector();
 		void	printDeque();
 
-		// Implementation de l'algo de tri par fusion
-		// @param lst : reference a un container (vector ou deque) contenant les elements a trier
+		// merge_sort() divise récursivement le tableau initial en sous-tableaux triés
+		// merge() fusionne ces sous-tableaux triés récursivement jusqu'à obtenir le tableau initial trié
+		// @param lst : reference a un container (vector ou deque) contenant les éléments a trier
 
 		template< typename T >
 		void	merge_sort(T &lst, int beg, int end)
@@ -48,8 +49,8 @@ class PmergeMe
 			{
 				mid = (beg + end) / 2;
 
-				merge_sort(lst, beg, mid); // tri recursif de la premiere moitie du tableau initial
-				merge_sort(lst, mid + 1, end); // deuxieme moitie
+				merge_sort(lst, beg, mid);
+				merge_sort(lst, mid + 1, end);
 				merge(lst, beg, mid, end);
 			}
 		}
@@ -67,33 +68,23 @@ class PmergeMe
 			int					k = 0;					// index pour inserer des elements dans temp
 
 			/**
-				@example lst = [3, 5, 8, 9, 1, 4, 6, 7]
+				@example lst = [5, 3, 1, 4, 2]
+
+				1er sous-tableau : [1, 3, 5]
+				2e sous-tableau : [2, 4]
 				
-				left = 0
-				right = 7
-				mid = 3
-
-				1er sous-tableau : [3, 5, 8, 9]
-				2e sous-tableau	 : [1, 4, 6, 7]
-
-				- i = 0 (pointe sur 2)
-				- j = 4 (pointe sur 1)
-				- k = 0
 			*/
 
-			// Fusionne les elements des deux sous-tableaux
-			// Et les copie de facon croissante dans tmp
-			// S'arrete lorsque l'un des deux sous-tableaux est copie trie dans tmp
+			// Compare les éléments des deux sous-tableaux
+			// Et les insère dans tmp dans l'ordre croissant
 
 			while (i <= mid && j <= right)
 			{
-				if (lst[i] <= lst[j]) // si 2 < 1
+				if (lst[i] <= lst[j])
 					temp[k++] = lst[i++];
 				else
 					temp[k++] = lst[j++];
 			}
-			
-			// temp = [1, 3, 4, 5]
 
 			// Copie les elements restants du premier sous-tableau (left-mid) dans tmp
 			// Arrive si des elements du 2e sous-tableau sont < aux elements restants du premier sous-tableau

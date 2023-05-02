@@ -6,70 +6,49 @@
 /*   By: lsalin <lsalin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 12:05:31 by lsalin            #+#    #+#             */
-/*   Updated: 2023/05/01 15:26:03 by lsalin           ###   ########.fr       */
+/*   Updated: 2023/05/02 11:40:39 by lsalin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "BitcoinExchange.hpp"
 
-void			checkArgs(int ac, char **av);
-std::fstream	*openFileStream(char *filename);
-void			evaluateInput(BitcoinExchange &btc, std::fstream &fs);
-bool			shouldLineBeEvaluated(char *line);
+void	checkArgs(int argc, char **argv);
+void	evaluateInput(BitcoinExchange &btc, std::fstream &fs);
+bool	shouldLineBeEvaluated(char *line);
 
-int	main(int ac, char **av)
+int main(int argc, char **argv)
 {
-	BitcoinExchange	*btc = NULL;
-	std::fstream	*fs = NULL;
+	BitcoinExchange *btc = NULL;
+	std::fstream	fs;
 
 	try
 	{
-		checkArgs(ac, av);
-		fs = openFileStream(av[1]);
-		
-		(void)fs;
-		
+		checkArgs(argc, argv);
+		fs.open(argv[1], std::fstream::in);
+
+		if (fs.fail())
+			throw(std::runtime_error("Could not open file"));
+
 		btc = new BitcoinExchange();
-		evaluateInput(*btc, *fs);
+		evaluateInput(*btc, fs);
 	}
 	catch (std::exception &e)
 	{
-		std::cerr << RED "Error: " << e.what() << RESET << std::endl;
+		std::cerr << "Error: " << e.what() << std::endl;
 		return (1);
 	}
 
 	delete btc;
-	delete fs;
-
 	return (0);
 }
 
-void	checkArgs(int ac, char **av)
+void	checkArgs(int argc, char **argv)
 {
-	(void)av;
-
-	if (ac != 2)
+	if (argc != 2)
 		throw (std::runtime_error("Usage: ./btc [file]"));
-}
 
-std::fstream	*openFileStream(char *filename)
-{
-	std::string	path = filename;
-	struct stat	filecheck;
-
-	if (stat(filename, &filecheck) != 0)
-		throw (std::runtime_error(path + ": invalid file"));
-
-	if ((filecheck.st_mode & S_IFREG) == 0)
-		throw (std::runtime_error(path + ": is a directory"));
-
-	std::fstream	*fs = new std::fstream();
-	fs->open(filename, std::fstream::in);
-
-	if (fs->fail())
-		throw (std::runtime_error(path + ": could not open file"));
-
-	return (fs);
+	if (std::string(argv[1]) != "input.txt")
+		throw (std::runtime_error("Error: Only input.txt is allowed"));
 }
 
 // Lit les lignes de input.txt
@@ -77,21 +56,16 @@ std::fstream	*openFileStream(char *filename)
 
 void	evaluateInput(BitcoinExchange &btc, std::fstream &fs)
 {
-	int	i = 0;
-
 	while (!fs.eof())
 	{
 		char	line[100];
 		fs.getline(line, 100);
 
 		if (fs.eof() || shouldLineBeEvaluated(line) == false)
-		{
-			i++;
 			continue;
-		}
 
-		if (VERBOSE)
-			std::cout << std::endl << CYAN "Input: " << line << RESET << std::endl;
+		if (BONUS)
+			std::cout << std::endl << "Input: " << line << std::endl;
 
 		std::string	*split = NULL;
 
@@ -102,11 +76,10 @@ void	evaluateInput(BitcoinExchange &btc, std::fstream &fs)
 		}
 		catch (std::exception &e)
 		{
-			std::cerr << "Error: " << e.what() << " (line " << i << ": " << line << ")" << std::endl;
+			std::cerr << "Error: " << e.what() << std::endl;
 		}
 
 		delete [] (split);
-		i++;
 	}
 }
 

@@ -6,7 +6,7 @@
 /*   By: lsalin <lsalin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 12:06:00 by lsalin            #+#    #+#             */
-/*   Updated: 2023/05/01 15:27:19 by lsalin           ###   ########.fr       */
+/*   Updated: 2023/05/02 11:16:07 by lsalin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,15 +62,15 @@ void	BitcoinExchange::_fillExchangeRateTable(void)
 	}
 }
 
-// Traite les donnes du .csv et ajoute les taux de change a la map _exchangeRate
-// 2009-01-02,0
+// Extrait les informations d'une ligne de data.csv ("2009-01-02,0")
+// Et ajoute la date et la valeur extraite à la map _exchangeRate
 
 void	BitcoinExchange::_fillExchangeRateEntry(std::string line)
 {
 	std::string	*split = splitString(line, ",");
 
-	_checkDateString(split[DATE]);
-	_checkValueString(split[VALUE]);
+	_checkDateString(split[DATE]);		// élément d'indice 0
+	_checkValueString(split[VALUE]);	// indice 1
 
 	time_t	date = _getEpochFromDateString(split[DATE]);
 	double	value = _getValueFromString(split[VALUE]);
@@ -101,30 +101,13 @@ void	BitcoinExchange::outputExchangeValueOnDate( std::string &dateStr, std::stri
 	double	exchangeRate = _getExchangeRateOnDate(date);
 	double	exchangeValue = getExchangeValueOnDate(dateStr, valueStr);
 
-	if (VERBOSE)
-		_printClosestExchangeRate(date);
-
 	std::cout << std::fixed;
 	std::cout.precision(2);
 	std::cout << "[" << _getDateFromEpoch(date) << "] " << value << " * ";
 	std::cout << exchangeRate << " = " << exchangeValue << std::endl;
 }
 
-// Affiche le taux de change le plus proche de la date donnée
-void	BitcoinExchange::_printClosestExchangeRate(time_t date)
-{
-	time_t		closestEpoch = _getClosestDateInTable(date);
-	std::string	closestDate = _getDateFromEpoch(closestEpoch);
-
-	std::cout << YELLOW << "Closest exchange data: " << closestDate << " -> ";
-
-	std::cout << std::fixed; // précision de 2 décimales
-	std::cout.precision(2);
-	
-	std::cout << _exchangeRate[closestEpoch] << RESET << std::endl;
-}
-
-// Retourne la valeur du bitcoin multipliée par son taux de change à la date donnée
+// Retourne quantité de btc * son prix à une certaine date
 // Si la date n'existe pas dans la DB, on utilise la plus proche inférieurement
 
 double	BitcoinExchange::getExchangeValueOnDate(std::string &dateStr, std::string &valueStr)
@@ -147,13 +130,13 @@ double	BitcoinExchange::_getExchangeRateOnDate(time_t date)
 
 /**
 	@brief Cherche la date du taux de change le plus proche de la date fournie
-	
-	@param date : date pour laquelle on souhaite obtenir le taux de change le plus proche (sujet)
-				  si elle n'existe pas dans la DB, on prends la plus proche (inférieure et non supérieure !)
+
+	@param date : date pour laquelle on souhaite obtenir le taux de change le plus proche
+				  si elle n'existe pas dans la DB, on prends la plus proche inférieurement
 
 	@return time_t : date la plus proche trouvée en temps Epoch
 
-	@example _exchangeRate = 
+	@example _exchangeRate =
 								10 avril 2023
 								12 avril 2023
 								13 avril 2023
@@ -166,7 +149,7 @@ double	BitcoinExchange::_getExchangeRateOnDate(time_t date)
 			2) 14 avril 2023 n'est pas antérieure au 10 avril 2023
 			3) Soustrait de 1 jour (86400s) la date fournie, à chaque tour de boucle
 			   Jusqu'à trouver la date la plus proche inférieurement (13 avril 2023 ici)
- */
+*/
 
 time_t	BitcoinExchange::_getClosestDateInTable(time_t date)
 {
@@ -181,7 +164,6 @@ time_t	BitcoinExchange::_getClosestDateInTable(time_t date)
 		return (_exchangeRate.begin()->first);
 
 	// Sinon, on recherche la date la plus proche
-
 	for (int i = 0; it == _exchangeRate.end(); i++)
 	{
 		time_t	newDate = date - i * 24 * 60 * 60; // 24 x 60 x 60 = nombre de s dans 1 journée
@@ -276,7 +258,6 @@ int	BitcoinExchange::_getDayFromString(std::string &dateStr) const
 }
 
 // Convertit un time_t (temps en s depuis 1970) en une string au format "YYYY-MM-DD"
-
 std::string const	BitcoinExchange::_getDateFromEpoch(time_t epochDate) const
 {
 	// localtime() convertit le temps en s depuis 1970 en une structure tm
