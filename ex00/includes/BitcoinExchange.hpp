@@ -35,7 +35,7 @@
 class BitcoinExchange
 {
 	private:
-		std::map<time_t, double>	_exchangeRate; // key = dates ; value = taux de change
+		std::map<time_t, double>	_exchangeRate;
 
 		void				_fillExchangeRateTable(void);
 		void				_fillExchangeRateEntry(std::string line);
@@ -69,7 +69,6 @@ class BitcoinExchange
 
 };
 
-// Utils
 std::string	*splitString(std::string string, std::string sep);
 bool		isStringEmpty(std::string string);
 
