@@ -51,9 +51,6 @@ void	checkArgs(int argc, char **argv)
 		throw (std::runtime_error("Error: Only input.txt is allowed"));
 }
 
-// Lit les lignes de input.txt
-// Analyse et traite chaque demande de taux de change pour une date donnee
-
 void	evaluateInput(BitcoinExchange &btc, std::fstream &fs)
 {
 	while (!fs.eof())
@@ -83,9 +80,6 @@ void	evaluateInput(BitcoinExchange &btc, std::fstream &fs)
 	}
 }
 
-// Retourne true si la ligne doit etre evaluee
-// Sinon false
-
 bool	shouldLineBeEvaluated(char *line)
 {
 	std::string	lineStr(line);
@@ -95,9 +89,6 @@ bool	shouldLineBeEvaluated(char *line)
 
 	return (true);
 }
-
-// Retourne true si la string est vide/ne contient que des caractères d'espacement
-// Retourne false si elle contient au moins 1 caractère
 
 bool	isStringEmpty(std::string string)
 {
@@ -114,7 +105,6 @@ bool	isStringEmpty(std::string string)
 	return (true);
 }
 
-// Separe les dates et les valeurs des fichiers input.txt et data.csv
 std::string	*splitString(std::string string, std::string sep)
 {
 	std::string	*split = new std::string[2];
