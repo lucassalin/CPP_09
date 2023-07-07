@@ -40,7 +40,6 @@ BitcoinExchange &BitcoinExchange::operator=(BitcoinExchange &src)
 	return (*this);
 }
 
-// Lit les donnees du .csv et les ajoutent a la map _exchangeRate
 void	BitcoinExchange::_fillExchangeRateTable(void)
 {
 	std::fstream	fs;
@@ -62,15 +61,12 @@ void	BitcoinExchange::_fillExchangeRateTable(void)
 	}
 }
 
-// Extrait les informations d'une ligne de data.csv ("2009-01-02,0")
-// Et ajoute la date et la valeur extraite à la map _exchangeRate
-
 void	BitcoinExchange::_fillExchangeRateEntry(std::string line)
 {
 	std::string	*split = splitString(line, ",");
 
-	_checkDateString(split[DATE]);		// élément d'indice 0
-	_checkValueString(split[VALUE]);	// indice 1
+	_checkDateString(split[DATE]);
+	_checkValueString(split[VALUE]);
 
 	time_t	date = _getEpochFromDateString(split[DATE]);
 	double	value = _getValueFromString(split[VALUE]);
@@ -79,7 +75,6 @@ void	BitcoinExchange::_fillExchangeRateEntry(std::string line)
 	delete [] (split);
 }
 
-// Ajoute une date et une valeur a la map _exchangeRate
 void	BitcoinExchange::_addExchangeRateEntry(time_t date, double value)
 {
 	std::map<time_t, double>::iterator	it = _exchangeRate.find(date);
@@ -91,7 +86,6 @@ void	BitcoinExchange::_addExchangeRateEntry(time_t date, double value)
 		_exchangeRate.insert(std::pair<time_t, double>(date, value));
 }
 
-// [2012-01-11] 1.00 * 7.10 = 7.10
 void	BitcoinExchange::outputExchangeValueOnDate( std::string &dateStr, std::string &valueStr )
 {
 	_checkInputStrings(dateStr, valueStr);
@@ -107,9 +101,6 @@ void	BitcoinExchange::outputExchangeValueOnDate( std::string &dateStr, std::stri
 	std::cout << exchangeRate << " = " << exchangeValue << std::endl;
 }
 
-// Retourne quantité de btc * son prix à une certaine date
-// Si la date n'existe pas dans la DB, on utilise la plus proche inférieurement
-
 double	BitcoinExchange::getExchangeValueOnDate(std::string &dateStr, std::string &valueStr)
 {
 	_checkInputStrings(dateStr, valueStr);
@@ -120,7 +111,6 @@ double	BitcoinExchange::getExchangeValueOnDate(std::string &dateStr, std::string
 	return (value * rate);
 }
 
-// Retourne le taux de change le plus proche pour la date donnée
 double	BitcoinExchange::_getExchangeRateOnDate(time_t date)
 {
 	time_t	closestDate = _getClosestDateInTable(date);
@@ -128,52 +118,22 @@ double	BitcoinExchange::_getExchangeRateOnDate(time_t date)
 	return (_exchangeRate[closestDate]);
 }
 
-/**
-	@brief Cherche la date du taux de change le plus proche de la date fournie
-
-	@param date : date pour laquelle on souhaite obtenir le taux de change le plus proche
-				  si elle n'existe pas dans la DB, on prends la plus proche inférieurement
-
-	@return time_t : date la plus proche trouvée en temps Epoch
-
-	@example _exchangeRate =
-								10 avril 2023
-								12 avril 2023
-								13 avril 2023
-								15 avril 2023
-								18 avril 2023
-
-			On veut obtenir le taux de change du 14 avril 2023
-			1) Conversion en temps Epoch (s)
-			2) 14 avril 2023 n'est pas présent dans la table
-			2) 14 avril 2023 n'est pas antérieure au 10 avril 2023
-			3) Soustrait de 1 jour (86400s) la date fournie, à chaque tour de boucle
-			   Jusqu'à trouver la date la plus proche inférieurement (13 avril 2023 ici)
-*/
-
 time_t	BitcoinExchange::_getClosestDateInTable(time_t date)
 {
-	// on check si la date recherchée est présente dans la map
-	// si oui, it pointe directement dessus
 	std::map<time_t, double>::iterator	it = _exchangeRate.find(date);
-
-	// si la date recherchée est antérieure à la première date de la table des taux de change
-	// --> on la retourne (car c'est la plus proche de la date recherchée)
 
 	if (date < _exchangeRate.begin()->first)
 		return (_exchangeRate.begin()->first);
 
-	// Sinon, on recherche la date la plus proche
 	for (int i = 0; it == _exchangeRate.end(); i++)
 	{
-		time_t	newDate = date - i * 24 * 60 * 60; // 24 x 60 x 60 = nombre de s dans 1 journée
+		time_t	newDate = date - i * 24 * 60 * 60;
 		it = _exchangeRate.find(newDate);
 	}
 
 	return (it->first);
 }
 
-// Convertit une date ("YYYY-MM-DD") en time_t
 time_t	BitcoinExchange::_getEpochFromDateString(std::string &dateStr) const
 {
 	struct tm	tm;
@@ -183,23 +143,20 @@ time_t	BitcoinExchange::_getEpochFromDateString(std::string &dateStr) const
 	tm.tm_mon = _getMonthFromString(dateStr) - 1;
 	tm.tm_mday = _getDayFromString(dateStr);
 
-	struct tm	copy; // utilisée pour vérifier la validité de la conversion en temps Epoch
+	struct tm	copy;
 	bzero(&copy, sizeof(copy));
 
 	copy.tm_year = tm.tm_year;
 	copy.tm_mon = tm.tm_mon;
 	copy.tm_mday = tm.tm_mday;
 
-	time_t	date = mktime(&tm); // mktime() renvoie (-1) si temps Epoch invalide
+	time_t	date = mktime(&tm);
 
 	if (date == -1 || copy.tm_year != tm.tm_year || copy.tm_mon != tm.tm_mon || copy.tm_mday != tm.tm_mday)
 		throw (std::out_of_range(dateStr + ": invalid date"));
 
 	return (date);
 }
-
-// Extrait l'année d'une date au format string (AAAA-MM-JJ)
-// Et la retourne sous forme d'int
 
 int	BitcoinExchange::_getYearFromString(std::string &dateStr) const
 {
@@ -212,9 +169,6 @@ int	BitcoinExchange::_getYearFromString(std::string &dateStr) const
 
 	return (year);
 }
-
-// Extrait le mois d'une date au format string (AAAA-MM-JJ)
-// Et le retourne sous forme d'int
 
 int	BitcoinExchange::_getMonthFromString(std::string &dateStr) const
 {
@@ -229,9 +183,6 @@ int	BitcoinExchange::_getMonthFromString(std::string &dateStr) const
 		
 	return (month);
 }
-
-// Extrait le jour d'une date au format "YYYY-MM-DD"
-// Et le retourne sous forme d'int
 
 int	BitcoinExchange::_getDayFromString(std::string &dateStr) const
 {
@@ -257,22 +208,17 @@ int	BitcoinExchange::_getDayFromString(std::string &dateStr) const
 	return (day);
 }
 
-// Convertit un time_t (temps en s depuis 1970) en une string au format "YYYY-MM-DD"
 std::string const	BitcoinExchange::_getDateFromEpoch(time_t epochDate) const
 {
-	// localtime() convertit le temps en s depuis 1970 en une structure tm
 	struct tm			*date = localtime(&epochDate);
 	std::stringstream	ss;
 
-	ss << std::setfill('0') << std::setw(4) << date->tm_year + 1900; // (+1900 car tm stocke les années depuis 1900)
-	ss << "-" << std::setfill('0') << std::setw(2) << date->tm_mon + 1; // + 1 car tm compte les mois de 0 à 11
+	ss << std::setfill('0') << std::setw(4) << date->tm_year + 1900;
+	ss << "-" << std::setfill('0') << std::setw(2) << date->tm_mon + 1;
 	ss << "-" << std::setfill('0') << std::setw(2) << date->tm_mday;
 
 	return (ss.str());
 }
-
-// Convertit une string représentant un nombre en double
-// Une valeur valide doit soit être un float soit être un int entre 0 et 1000
 
 double	BitcoinExchange::_getValueFromString(std::string &valueStr) const
 {
@@ -287,15 +233,11 @@ double	BitcoinExchange::_getValueFromString(std::string &valueStr) const
 	return (value);
 }
 
-// Check si date/valeur valide ou non
 void	BitcoinExchange::_checkInputStrings(std::string &dateStr, std::string &valueStr) const
 {
 	_checkDateString(dateStr);
 	_checkValueString(valueStr);
 }
-
-// Check si la string représente une valeur possible du prix du Bitcoin
-// Lève des exceptions sinon
 
 void	BitcoinExchange::_checkValueString(std::string &string) const
 {
@@ -317,16 +259,12 @@ void	BitcoinExchange::_checkValueString(std::string &string) const
 	}
 }
 
-// Check si la string représente une date valide "Year-Month-Day" (donc chiffres et "-")
-// Lève une exception si c'est pas le cas
-
 void	BitcoinExchange::_checkDateString(std::string &string) const
 {
 	if (isStringEmpty(string))
 		throw (std::runtime_error("no date provided"));
 
 	std::string	required = "0123456789-";
-	// cherche la première occurence d'un caractère appartenant à required dans string
 	size_t		pos = string.find_first_of(required, 0);
 
 	if (pos == std::string::npos)
@@ -340,10 +278,6 @@ void	BitcoinExchange::_checkDateString(std::string &string) const
 			throw (std::runtime_error(string + ": invalid date"));
 	}
 }
-
-// Check si la string (représentant le jour d'une date) est valide
-// Valide = ne contient que des chiffres ou des espaces
-// Lève une exception si c'est pas le cas
 
 void	BitcoinExchange::_checkDayString(std::string &string) const
 {
